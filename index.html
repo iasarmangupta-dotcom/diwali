@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨ Diwali Cracker Celebration - ARMAN 🪔</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #050714;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+    }
+
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    /* Screen Flash Effect for Bomb */
+    #flash-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.05s ease-out;
+    }
+
+    /* Header Controls UI */
+    .ui-header {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      right: 15px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .header-title {
+      background: rgba(15, 18, 37, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px dashed rgba(255, 215, 0, 0.4);
+      padding: 10px 18px;
+      border-radius: 20px;
+      pointer-events: auto;
+      box-shadow: 0 4px 20px rgba(255, 153, 0, 0.3);
+    }
+
+    .header-title h1 {
+      font-size: 22px;
+      background: linear-gradient(45deg, #FFD700, #FF5722, #FF007F);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .header-title p {
+      font-size: 11px;
+      color: #ffd580;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .input-box {
+      background: rgba(22, 25, 45, 0.9);
+      border: 1.5px solid #ff9800;
+      border-radius: 20px;
+      padding: 8px 14px;
+      color: #ffd700;
+      font-weight: bold;
+      font-size: 14px;
+      outline: none;
+      text-transform: uppercase;
+      width: 120px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #ff9800, #e65100);
+      color: #fff;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(230, 81, 0, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 152, 0, 0.6);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(8px);
+    }
+
+    /* Bottom Toolbar Dock */
+    .ui-dock {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      background: rgba(18, 20, 38, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(255, 215, 0, 0.4);
+      border-radius: 30px;
+      padding: 8px 14px;
+      display: flex;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 152, 0, 0.25);
+      max-width: 95vw;
+      overflow-x: auto;
+    }
+
+    .cracker-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid transparent;
+      border-radius: 20px;
+      padding: 8px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      min-width: 75px;
+    }
+
+    .cracker-btn .icon {
+      font-size: 24px;
+      margin-bottom: 3px;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+    }
+
+    .cracker-btn .label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #ccc;
+      white-space: nowrap;
+    }
+
+    .cracker-btn.active {
+      background: linear-gradient(135deg, #ff9800, #ff5722);
+      border-color: #ffd700;
+      box-shadow: 0 0 15px rgba(255, 152, 0, 0.6);
+      transform: scale(1.06);
+    }
+
+    .cracker-btn.active .label {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    /* Hint banner */
+    .hint-banner {
+      position: absolute;
+      top: 85px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9;
+      background: rgba(0, 0, 0, 0.65);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #ffe0b2;
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      pointer-events: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      animation: pulse 2s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.7; transform: translateX(-50%) scale(0.98); }
+      100% { opacity: 1; transform: translateX(-50%) scale(1.02); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="flash-overlay"></div>
+  <canvas id="canvas"></canvas>
+
+  <div class="ui-header">
+    <div class="header-title">
+      <h1>✨ SHUBH DIWALI 🪔</h1>
+      <p>👦 Ladka aayega -> Aag lagayega -> 🚀 Arman Name Sky me fategi!</p>
+    </div>
+
+    <div class="header-actions">
+      <input type="text" id="nameInput" class="input-box" value="ARMAN" title="Fireworks Name" placeholder="ARMAN" maxlength="8">
+      <button class="btn btn-secondary" id="soundBtn" onclick="toggleSound()">🔊 Sound ON</button>
+      <button class="btn" onclick="triggerAutoShow()">🎆 Rocket Show!</button>
+    </div>
+  </div>
+
+  <div class="hint-banner" id="hintBanner">
+    💡 Select Pataka below & click anywhere to send the Boy to light it! 🕯️
+  </div>
+
+  <div class="ui-dock">
+    <div class="cracker-btn active" onclick="selectCracker('rocket', this)">
+      <span class="icon">🚀</span>
+      <span class="label">Rocket (Arman)</span>
+    </div>
+    <div class="cracker-btn" onclick="selectCracker('bomb', this)">
+      <span class="icon">💣</span>
+      <span class="label">Bam (Bomb)</span>
+    </div>
+    <div class="cracker-btn" onclick="selectCracker('chakri', this)">
+      <span class="icon">🌀</span>
+      <span class="label">Chakri</span>
+    </div>
+    <div class="cracker-btn" onclick="selectCracker('anaar', this)">
+      <span class="icon">🎇</span>
+      <span class="label">Aftab (10 Fira)</span>
+    </div>
+    <div class="cracker-btn" onclick="selectCracker('sparkler', this)">
+      <span class="icon">🪄</span>
+      <span class="label">Phuljhadi</span>
+    </div>
+  </div>
+
+  <script>
+    // Audio Synthesizer (Web Audio API)
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundBtn').innerText = soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF';
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'whistle') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(350, now);
+        osc.frequency.exponentialRampToValueAtTime(1500, now + 0.7);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.7);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.7);
+      } else if (type === 'boom') {
+        const bufferSize = audioCtx.sampleRate * 0.6;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(400, now);
+        filter.frequency.exponentialRampToValueAtTime(30, now + 0.6);
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.6, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start(now);
+      } else if (type === 'bomb') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(25, now + 0.45);
+        gain.gain.setValueAtTime(0.9, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      } else if (type === 'fizz') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(900 + Math.random() * 500, now);
+        gain.gain.setValueAtTime(0.09, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } else if (type === 'footstep') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(120, now);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.05);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      }
+    }
+
+    // Canvas Setup
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // App State
+    let selectedType = 'rocket';
+    let particles = [];
+    let rockets = [];
+    let anaars = [];
+    let chakris = [];
+    let bombs = [];
+    let pendingCrackers = [];
+    let isSparklerActive = false;
+    let sparklerTouch = null;
+    let screenShake = 0;
+    let flashOpacity = 0;
+
+    // Animated Boy Character ("Chhotu")
+    const boy = {
+      x: width * 0.5,
+      y: height - 100,
+      targetX: width * 0.5,
+      speed: 5.5,
+      state: 'IDLE', // IDLE, WALKING, LIGHTING, RUNNING_BACK, CELEBRATING
+      facingLeft: false,
+      walkFrame: 0,
+      lightTimer: 0,
+      speechBubble: "Happy Diwali! 🪔",
+      speechTimer: 180,
+      currentTask: null
+    };
+
+    function selectCracker(type, btn) {
+      selectedType = type;
+      document.querySelectorAll('.cracker-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // Interactive Tap/Click Handling
+    window.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.ui-header') || e.target.closest('.ui-dock')) return;
+      initAudio();
+
+      if (selectedType === 'sparkler') {
+        isSparklerActive = true;
+        sparklerTouch = { x: e.clientX, y: e.clientY };
+      } else {
+        queueCrackerTask(e.clientX, e.clientY);
+      }
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (isSparklerActive) {
+        sparklerTouch = { x: e.clientX, y: e.clientY };
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      isSparklerActive = false;
+      sparklerTouch = null;
+    });
+
+    function queueCrackerTask(tx, ty) {
+      const groundY = height - 100;
+      const name = document.getElementById('nameInput').value.trim() || "ARMAN";
+
+      const task = {
+        type: selectedType,
+        x: Math.max(80, Math.min(width - 80, tx)),
+        targetY: Math.max(80, ty),
+        text: name.toUpperCase(),
+        state: 'WAITING_FOR_BOY'
+      };
+
+      pendingCrackers.push(task);
+      setBoySpeech("Aag lagane jaa raha hu! 🕯️");
+    }
+
+    function setBoySpeech(text, duration = 120) {
+      boy.speechBubble = text;
+      boy.speechTimer = duration;
+    }
+
+    function triggerAutoShow() {
+      const name = document.getElementById('nameInput').value.trim() || "ARMAN";
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          const rx = (width * 0.25) + Math.random() * (width * 0.5);
+          const ry = 90 + Math.random() * 120;
+          queueCrackerTask(rx, ry);
+        }, i * 1500);
+      }
+    }
+
+    // Letter shape point generator for Name Fireworks
+    function getLetterShape(letter) {
+      const pts = [];
+      switch (letter) {
+        case 'A':
+          for (let y = 0; y <= 20; y += 2) {
+            pts.push({ x: 10 - y * 0.5, y: y });
+            pts.push({ x: 10 + y * 0.5, y: y });
+          }
+          for (let x = 5; x <= 15; x += 2) pts.push({ x: x, y: 10 });
+          break;
+        case 'R':
+          for (let y = 0; y <= 20; y += 2) pts.push({ x: 0, y: y });
+          for (let a = -Math.PI/2; a <= Math.PI/2; a += 0.3) {
+            pts.push({ x: 5 + Math.cos(a) * 5, y: 5 + Math.sin(a) * 5 });
+          }
+          for (let d = 0; d <= 10; d += 2) pts.push({ x: d, y: 10 + d });
+          break;
+        case 'M':
+          for (let y = 0; y <= 20; y += 2) {
+            pts.push({ x: 0, y: y });
+            pts.push({ x: 20, y: y });
+          }
+          for (let d = 0; d <= 10; d += 2) {
+            pts.push({ x: d, y: d });
+            pts.push({ x: 20 - d, y: d });
+          }
+          break;
+        case 'N':
+          for (let y = 0; y <= 20; y += 2) {
+            pts.push({ x: 0, y: y });
+            pts.push({ x: 18, y: y });
+          }
+          for (let d = 0; d <= 18; d += 2) pts.push({ x: d, y: d * (20/18) });
+          break;
+        case 'I':
+          for (let y = 0; y <= 20; y += 2) pts.push({ x: 5, y: y });
+          for (let x = 0; x <= 10; x += 2) {
+            pts.push({ x: x, y: 0 });
+            pts.push({ x: x, y: 20 });
+          }
+          break;
+        case 'D':
+          for (let y = 0; y <= 20; y += 2) pts.push({ x: 0, y: y });
+          for (let a = -Math.PI/2; a <= Math.PI/2; a += 0.2) {
+            pts.push({ x: Math.cos(a) * 10, y: 10 + Math.sin(a) * 10 });
+          }
+          break;
+        case 'W':
+          for (let y = 0; y <= 20; y += 2) {
+            pts.push({ x: 0, y: y });
+            pts.push({ x: 20, y: y });
+          }
+          for (let d = 0; d <= 10; d += 2) {
+            pts.push({ x: d, y: 20 - d });
+            pts.push({ x: 20 - d, y: 20 - d });
+          }
+          break;
+        case 'L':
+          for (let y = 0; y <= 20; y += 2) pts.push({ x: 0, y: y });
+          for (let x = 0; x <= 14; x += 2) pts.push({ x: x, y: 20 });
+          break;
+        default:
+          for (let a = 0; a < 2 * Math.PI; a += 0.4) {
+            pts.push({ x: 10 + Math.cos(a) * 8, y: 10 + Math.sin(a) * 8 });
+          }
+          break;
+      }
+      return pts;
+    }
+
+    function generateTextPoints(text) {
+      const points = [];
+      let offsetX = 0;
+      for (let i = 0; i < text.length; i++) {
+        const letter = text[i];
+        const letterPts = getLetterShape(letter);
+        for (let pt of letterPts) {
+          points.push({ x: pt.x + offsetX, y: pt.y });
+        }
+        offsetX += 30;
+      }
+      return points;
+    }
+
+    function explodeRocketName(cx, cy, text) {
+      screenShake = 7;
+      playSound('boom');
+      setBoySpeech("Waah " + text + "! 🎆🎉", 150);
+      boy.state = 'CELEBRATING';
+
+      const colors = ['#FFD700', '#FF5722', '#00E5FF', '#FF007F', '#76FF03', '#E040FB'];
+      for (let i = 0; i < 90; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 8 + 2;
+        particles.push({
+          x: cx,
+          y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: Math.random() * 3 + 2,
+          life: 0.8 + Math.random() * 0.5,
+          maxLife: 1.3
+        });
+      }
+
+      // Spellout Name in glowing fireworks points
+      const textPts = generateTextPoints(text);
+      const scale = 2.4;
+      const startX = cx - (textPts.length > 0 ? (text.length * 30 * scale) / 2 : 0);
+
+      textPts.forEach(pt => {
+        const px = startX + pt.x * scale;
+        const py = cy + pt.y * scale;
+
+        particles.push({
+          x: px,
+          y: py,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: (Math.random() - 0.5) * 0.6,
+          color: '#FFD700',
+          size: 3.8,
+          life: 2.6 + Math.random() * 0.6,
+          maxLife: 3.2,
+          isText: true
+        });
+
+        for (let k = 0; k < 2; k++) {
+          particles.push({
+            x: px + (Math.random() - 0.5) * 5,
+            y: py + (Math.random() - 0.5) * 5,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            size: 2.0,
+            life: 2.2 + Math.random() * 0.5,
+            maxLife: 2.7,
+            isText: true
+          });
+        }
+      });
+    }
+
+    function triggerBombExplosion(bx, by) {
+      screenShake = 18;
+      flashOpacity = 0.85;
+      document.getElementById('flash-overlay').style.opacity = flashOpacity;
+      playSound('bomb');
+
+      for (let i = 0; i < 110; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 15 + 3;
+        particles.push({
+          x: bx,
+          y: by,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color: i % 2 === 0 ? '#FF3D00' : '#FFEA00',
+          size: Math.random() * 5 + 3,
+          life: 0.6 + Math.random() * 0.4,
+          maxLife: 1.0
+        });
+      }
+    }
+
+    // Main Game & Animation Loop
+    let lastTime = performance.now();
+    function loop(time) {
+      const dt = (time - lastTime) / 1000;
+      lastTime = time;
+
+      // Update Boy AI & State Machine
+      updateBoyAI();
+
+      // Screen shake decay
+      if (screenShake > 0) screenShake = Math.max(0, screenShake - 0.8);
+      if (flashOpacity > 0) {
+        flashOpacity = Math.max(0, flashOpacity - 0.05);
+        document.getElementById('flash-overlay').style.opacity = flashOpacity;
+      }
+
+      ctx.save();
+      if (screenShake > 0) {
+        ctx.translate((Math.random() - 0.5) * screenShake, (Math.random() - 0.5) * screenShake);
+      }
+
+      // 1. Night Sky Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+      skyGrad.addColorStop(0, '#030514');
+      skyGrad.addColorStop(0.4, '#0A0E2A');
+      skyGrad.addColorStop(0.7, '#1A1438');
+      skyGrad.addColorStop(1, '#2C1434');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Twinkling Stars
+      ctx.fillStyle = '#ffffff';
+      for (let i = 0; i < 70; i++) {
+        const sx = (Math.sin(i * 99) * 0.5 + 0.5) * width;
+        const sy = (Math.cos(i * 33) * 0.5 + 0.5) * (height * 0.6);
+        const blink = (Math.sin(time * 0.003 + i) + 1) / 2;
+        ctx.globalAlpha = 0.2 + blink * 0.8;
+        ctx.beginPath();
+        ctx.arc(sx, sy, (i % 3 === 0 ? 1.8 : 1), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1.0;
+
+      // 3. Moon
+      const moonX = width * 0.85;
+      const moonY = 85;
+      ctx.fillStyle = '#FFFDD0';
+      ctx.shadowColor = '#FFFDD0';
+      ctx.shadowBlur = 20;
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, 28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#0A0E2A';
+      ctx.beginPath();
+      ctx.arc(moonX - 9, moonY - 4, 24, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4. House & Lawn
+      drawHouseAndLawn(time);
+
+      // 5. Draw Pending Crackers on Ground waiting for boy
+      const groundY = height - 100;
+      pendingCrackers.forEach(task => {
+        if (task.state === 'WAITING_FOR_BOY' || task.state === 'BEING_LIT') {
+          drawGroundCrackerItem(task.type, task.x, groundY, task.state === 'BEING_LIT');
+        }
+      });
+
+      // 6. Active Rockets
+      for (let i = rockets.length - 1; i >= 0; i--) {
+        const r = rockets[i];
+        if (!r.exploded) {
+          r.y -= r.speed;
+
+          particles.push({
+            x: r.x + (Math.random() - 0.5) * 4,
+            y: r.y + 10,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: Math.random() * 2 + 1,
+            color: '#FF9800',
+            size: 2.5,
+            life: 0.3,
+            maxLife: 0.3
+          });
+
+          ctx.strokeStyle = '#8D6E63';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(r.x, r.y);
+          ctx.lineTo(r.x, r.y + 18);
+          ctx.stroke();
+
+          ctx.fillStyle = '#FF3D00';
+          ctx.beginPath();
+          ctx.moveTo(r.x, r.y - 10);
+          ctx.lineTo(r.x - 5, r.y);
+          ctx.lineTo(r.x + 5, r.y);
+          ctx.closePath();
+          ctx.fill();
+
+          if (r.y <= r.targetY) {
+            r.exploded = true;
+            explodeRocketName(r.x, r.y, r.text);
+            rockets.splice(i, 1);
+          }
+        }
+      }
+
+      // 7. Active Anaars
+      for (let i = anaars.length - 1; i >= 0; i--) {
+        const a = anaars[i];
+        a.duration -= 0.016;
+        if (a.duration > 0) {
+          if (Math.random() < 0.8) playSound('fizz');
+          for (let p = 0; p < 7; p++) {
+            const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.7;
+            const speed = Math.random() * 9 + 4;
+            const colors = ['#00E5FF', '#FFEA00', '#FF007F', '#76FF03', '#FF9800'];
+            particles.push({
+              x: a.x,
+              y: a.y,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed,
+              color: colors[Math.floor(Math.random() * colors.length)],
+              size: Math.random() * 3 + 2,
+              life: 0.6 + Math.random() * 0.4,
+              maxLife: 1.0
+            });
+          }
+        } else {
+          anaars.splice(i, 1);
+        }
+      }
+
+      // 8. Active Chakris
+      for (let i = chakris.length - 1; i >= 0; i--) {
+        const c = chakris[i];
+        c.duration -= 0.016;
+        c.rotation += 0.4;
+        if (c.duration > 0) {
+          if (Math.random() < 0.6) playSound('fizz');
+          for (let p = 0; p < 5; p++) {
+            const angle = c.rotation + (p * Math.PI / 2.5);
+            const speed = Math.random() * 6 + 3;
+            particles.push({
+              x: c.x,
+              y: c.y,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed + 0.5,
+              color: '#FFD700',
+              size: 3.0,
+              life: 0.4 + Math.random() * 0.3,
+              maxLife: 0.7
+            });
+          }
+          ctx.save();
+          ctx.translate(c.x, c.y - 4);
+          ctx.rotate(c.rotation);
+          ctx.strokeStyle = '#FFD700';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(0, 0, 12, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        } else {
+          chakris.splice(i, 1);
+        }
+      }
+
+      // 9. Active Bombs
+      for (let i = bombs.length - 1; i >= 0; i--) {
+        const b = bombs[i];
+        if (!b.exploded) {
+          b.fuse -= 0.03;
+          particles.push({
+            x: b.x + 4,
+            y: b.y - 12,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -Math.random() * 2,
+            color: '#FF3D00',
+            size: 2,
+            life: 0.2,
+            maxLife: 0.2
+          });
+
+          ctx.fillStyle = '#222';
+          ctx.beginPath();
+          ctx.arc(b.x, b.y - 6, 10, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#795548';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(b.x, b.y - 12);
+          ctx.lineTo(b.x + 5, b.y - 18);
+          ctx.stroke();
+
+          if (b.fuse <= 0) {
+            b.exploded = true;
+            triggerBombExplosion(b.x, b.y);
+            bombs.splice(i, 1);
+          }
+        }
+      }
+
+      // 10. Sparkler Emission
+      if (isSparklerActive && sparklerTouch) {
+        if (Math.random() < 0.7) playSound('fizz');
+        for (let p = 0; p < 8; p++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 5 + 1;
+          particles.push({
+            x: sparklerTouch.x,
+            y: sparklerTouch.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            color: '#FFEE58',
+            size: Math.random() * 3 + 1.5,
+            life: 0.3 + Math.random() * 0.3,
+            maxLife: 0.6
+          });
+        }
+        ctx.strokeStyle = '#B0BEC5';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(sparklerTouch.x + 15, sparklerTouch.y + 35);
+        ctx.lineTo(sparklerTouch.x, sparklerTouch.y);
+        ctx.stroke();
+      }
+
+      // 11. Draw Animated Boy Character ("Chhotu")
+      drawBoyCharacter();
+
+      // 12. Particles physics & draw
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life -= 0.016;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+        } else {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (!p.isText) {
+            p.vy += 0.08;
+          } else {
+            p.vx *= 0.95;
+            p.vy *= 0.95;
+          }
+
+          const alpha = Math.max(0, p.life / p.maxLife);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1.0;
+
+      ctx.restore();
+      requestAnimationFrame(loop);
+    }
+
+    // Boy Character AI Logic
+    function updateBoyAI() {
+      if (boy.speechTimer > 0) boy.speechTimer--;
+
+      if (!boy.currentTask && pendingCrackers.length > 0) {
+        boy.currentTask = pendingCrackers.shift();
+        boy.targetX = boy.currentTask.x;
+        boy.state = 'WALKING';
+        setBoySpeech("Aag lagane jaa raha hu! 🕯️");
+      }
+
+      const dx = boy.targetX - boy.x;
+
+      if (boy.state === 'WALKING') {
+        if (Math.abs(dx) > 15) {
+          boy.facingLeft = dx < 0;
+          boy.x += (dx > 0 ? 1 : -1) * boy.speed;
+          boy.walkFrame += 0.25;
+          if (Math.floor(boy.walkFrame) % 4 === 0) playSound('footstep');
+        } else {
+          // Arrived at cracker position
+          boy.state = 'LIGHTING';
+          boy.lightTimer = 45; // 0.75 second to light matchstick
+          if (boy.currentTask) boy.currentTask.state = 'BEING_LIT';
+          setBoySpeech("Fuse jala raha hu... 🕯️");
+        }
+      } else if (boy.state === 'LIGHTING') {
+        boy.lightTimer--;
+        // Emit flame sparks at hand
+        const handX = boy.x + (boy.facingLeft ? -15 : 15);
+        const handY = boy.y - 15;
+        particles.push({
+          x: handX + (Math.random() - 0.5) * 3,
+          y: handY + (Math.random() - 0.5) * 3,
+          vx: (Math.random() - 0.5) * 2,
+          vy: -Math.random() * 2,
+          color: '#FF3D00',
+          size: 2,
+          life: 0.2,
+          maxLife: 0.2
+        });
+
+        if (boy.lightTimer <= 0) {
+          // Fuse lit! Now ignite cracker & run away!
+          if (boy.currentTask) {
+            igniteCrackerTask(boy.currentTask);
+            boy.currentTask = null;
+          }
+          boy.targetX = boy.x > width * 0.5 ? width * 0.85 : width * 0.15;
+          boy.state = 'RUNNING_BACK';
+          setBoySpeech("BHAAGO! BHAAGO! 🏃‍♂️💨", 90);
+        }
+      } else if (boy.state === 'RUNNING_BACK') {
+        if (Math.abs(dx) > 15) {
+          boy.facingLeft = dx < 0;
+          boy.x += (dx > 0 ? 1 : -1) * (boy.speed * 1.3);
+          boy.walkFrame += 0.4;
+        } else {
+          boy.state = 'IDLE';
+        }
+      } else if (boy.state === 'CELEBRATING') {
+        boy.walkFrame += 0.2;
+        if (boy.speechTimer <= 0) boy.state = 'IDLE';
+      }
+    }
+
+    function igniteCrackerTask(task) {
+      const groundY = height - 100;
+
+      if (task.type === 'rocket') {
+        rockets.push({
+          x: task.x,
+          y: groundY,
+          targetY: task.targetY,
+          speed: 9.5 + Math.random() * 3,
+          exploded: false,
+          text: task.text
+        });
+        playSound('whistle');
+      } else if (task.type === 'bomb') {
+        bombs.push({
+          x: task.x,
+          y: groundY,
+          fuse: 0.8,
+          exploded: false
+        });
+      } else if (task.type === 'chakri') {
+        chakris.push({
+          x: task.x,
+          y: groundY,
+          rotation: 0,
+          duration: 3.8
+        });
+      } else if (task.type === 'anaar') {
+        anaars.push({
+          x: task.x,
+          y: groundY,
+          duration: 4.5
+        });
+      }
+    }
+
+    // Draw Boy Character ("Chhotu")
+    function drawBoyCharacter() {
+      ctx.save();
+      ctx.translate(boy.x, boy.y);
+
+      // Bounce offset during walk/jump
+      let bounceY = 0;
+      if (boy.state === 'WALKING' || boy.state === 'RUNNING_BACK') {
+        bounceY = Math.abs(Math.sin(boy.walkFrame * 2)) * -6;
+      } else if (boy.state === 'CELEBRATING') {
+        bounceY = Math.abs(Math.sin(boy.walkFrame * 3)) * -12;
+      }
+
+      ctx.translate(0, bounceY);
+      if (boy.facingLeft) ctx.scale(-1, 1);
+
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 12, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Legs
+      const legAngle = Math.sin(boy.walkFrame * 2) * 0.5;
+      ctx.strokeStyle = '#1565C0'; // Blue jeans
+      ctx.lineWidth = 4;
+
+      ctx.beginPath();
+      ctx.moveTo(-4, -18);
+      ctx.lineTo(-4 + Math.sin(legAngle) * 8, 0);
+      ctx.moveTo(4, -18);
+      ctx.lineTo(4 - Math.sin(legAngle) * 8, 0);
+      ctx.stroke();
+
+      // Torso / Kurta (Festive Orange)
+      ctx.fillStyle = '#FF6F00';
+      ctx.beginPath();
+      ctx.roundRect(-10, -42, 20, 24, 6);
+      ctx.fill();
+
+      // Neck & Face
+      ctx.fillStyle = '#FFCC80'; // Skin tone
+      ctx.beginPath();
+      ctx.arc(0, -50, 11, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hair (Black cap/hair)
+      ctx.fillStyle = '#212121';
+      ctx.beginPath();
+      ctx.arc(0, -53, 11, Math.PI, Math.PI * 2);
+      ctx.fill();
+
+      // Eyes & Smile
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(4, -51, 1.8, 0, Math.PI * 2); // Right Eye
+      ctx.fill();
+
+      ctx.strokeStyle = '#D84315';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(3, -47, 4, 0.2, Math.PI - 0.2);
+      ctx.stroke();
+
+      // Hands & Matchstick
+      ctx.strokeStyle = '#FF6F00';
+      ctx.lineWidth = 3.5;
+
+      if (boy.state === 'RUNNING_BACK') {
+        // Covering ears while running!
+        ctx.beginPath();
+        ctx.moveTo(-8, -36);
+        ctx.lineTo(-12, -48);
+        ctx.moveTo(8, -36);
+        ctx.lineTo(12, -48);
+        ctx.stroke();
+      } else if (boy.state === 'LIGHTING') {
+        // Bending down holding matchstick to fuse
+        ctx.beginPath();
+        ctx.moveTo(6, -34);
+        ctx.lineTo(18, -22);
+        ctx.stroke();
+
+        // Matchstick stick & flame
+        ctx.strokeStyle = '#8D6E63';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(18, -22);
+        ctx.lineTo(24, -16);
+        ctx.stroke();
+
+        ctx.fillStyle = '#FF3D00';
+        ctx.beginPath();
+        ctx.arc(24, -16, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Normal hands
+        ctx.beginPath();
+        ctx.moveTo(-9, -36);
+        ctx.lineTo(-14, -22);
+        ctx.moveTo(9, -36);
+        ctx.lineTo(14, -22);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+
+      // Draw Speech Bubble
+      if (boy.speechTimer > 0 && boy.speechBubble) {
+        ctx.save();
+        ctx.font = 'bold 12px Segoe UI, sans-serif';
+        const textWidth = ctx.measureText(boy.speechBubble).width;
+        const bx = boy.x - textWidth / 2 - 8;
+        const by = boy.y - 75 + bounceY;
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.roundRect(bx, by, textWidth + 16, 24, 12);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#000';
+        ctx.fillText(boy.speechBubble, bx + 8, by + 16);
+        ctx.restore();
+      }
+    }
+
+    function drawGroundCrackerItem(type, x, y, isBeingLit) {
+      ctx.save();
+      if (type === 'rocket') {
+        ctx.strokeStyle = '#8D6E63';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y - 24);
+        ctx.stroke();
+
+        ctx.fillStyle = '#FF3D00';
+        ctx.beginPath();
+        ctx.moveTo(x, y - 36);
+        ctx.lineTo(x - 6, y - 24);
+        ctx.lineTo(x + 6, y - 24);
+        ctx.closePath();
+        ctx.fill();
+      } else if (type === 'bomb') {
+        ctx.fillStyle = '#222';
+        ctx.beginPath();
+        ctx.arc(x, y - 6, 9, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (type === 'chakri') {
+        ctx.strokeStyle = '#FF9800';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(x, y - 6, 10, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (type === 'anaar') {
+        ctx.fillStyle = '#AB47BC';
+        ctx.beginPath();
+        ctx.moveTo(x - 10, y);
+        ctx.lineTo(x - 5, y - 18);
+        ctx.lineTo(x + 5, y - 18);
+        ctx.lineTo(x + 10, y);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      if (isBeingLit) {
+        // Fuse spark glow
+        ctx.fillStyle = '#FFEA00';
+        ctx.beginPath();
+        ctx.arc(x, y - 20, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    function drawHouseAndLawn(time) {
+      const groundY = height - 100;
+
+      const lawnGrad = ctx.createLinearGradient(0, groundY, 0, height);
+      lawnGrad.addColorStop(0, '#0F2615');
+      lawnGrad.addColorStop(1, '#051108');
+      ctx.fillStyle = lawnGrad;
+      ctx.fillRect(0, groundY, width, height - groundY);
+
+      const houseW = 230;
+      const houseH = 145;
+      const houseX = width * 0.5 - houseW / 2;
+      const houseY = groundY - houseH;
+
+      const wallGrad = ctx.createLinearGradient(houseX, houseY, houseX + houseW, houseY + houseH);
+      wallGrad.addColorStop(0, '#3D1F2D');
+      wallGrad.addColorStop(1, '#22111A');
+      ctx.fillStyle = wallGrad;
+      ctx.fillRect(houseX, houseY, houseW, houseH);
+
+      ctx.fillStyle = '#8B263E';
+      ctx.beginPath();
+      ctx.moveTo(houseX - 15, houseY);
+      ctx.lineTo(houseX + houseW / 2, houseY - 60);
+      ctx.lineTo(houseX + houseW + 15, houseY);
+      ctx.closePath();
+      ctx.fill();
+
+      const doorX = houseX + houseW / 2 - 20;
+      const doorY = houseY + houseH - 55;
+      ctx.fillStyle = '#4A2B11';
+      ctx.fillRect(doorX, doorY, 40, 55);
+
+      ctx.fillStyle = 'rgba(255, 193, 7, 0.25)';
+      ctx.fillRect(doorX - 5, doorY - 5, 50, 60);
+
+      drawWindow(houseX + 25, houseY + 30, 40, 40);
+      drawWindow(houseX + houseW - 65, houseY + 30, 40, 40);
+
+      const bulbColors = ['#FF1744', '#FFEA00', '#00E5FF', '#76FF03', '#E040FB'];
+      for (let i = 0; i <= 12; i++) {
+        const bx = houseX - 10 + (i * (houseW + 20) / 12);
+        const by = houseY + (i % 2 === 0 ? 6 : 2);
+        const colIndex = (i + Math.floor(time * 0.005)) % bulbColors.length;
+        ctx.fillStyle = bulbColors[colIndex];
+        ctx.shadowColor = bulbColors[colIndex];
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(bx, by, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+
+      const diyaPositions = [0.1, 0.25, 0.4, 0.6, 0.75, 0.9];
+      diyaPositions.forEach((pos, idx) => {
+        const dx = width * pos;
+        const dy = groundY - 4;
+
+        ctx.fillStyle = '#D84315';
+        ctx.beginPath();
+        ctx.moveTo(dx - 12, dy);
+        ctx.quadraticCurveTo(dx, dy + 12, dx + 12, dy);
+        ctx.fill();
+
+        const flicker = Math.sin(time * 0.01 + idx * 2) * 2;
+        ctx.fillStyle = 'rgba(255, 152, 0, 0.6)';
+        ctx.beginPath();
+        ctx.arc(dx, dy - 6, 8 + flicker, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#FFEA00';
+        ctx.beginPath();
+        ctx.moveTo(dx - 4, dy - 2);
+        ctx.quadraticCurveTo(dx, dy - 14 - flicker, dx + 4, dy - 2);
+        ctx.fill();
+      });
+    }
+
+    function drawWindow(wx, wy, ww, wh) {
+      ctx.fillStyle = 'rgba(255, 213, 79, 0.9)';
+      ctx.shadowColor = '#FFB300';
+      ctx.shadowBlur = 12;
+      ctx.fillRect(wx, wy, ww, wh);
+      ctx.shadowBlur = 0;
+
+      ctx.strokeStyle = '#3A1C08';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(wx, wy, ww, wh);
+      ctx.beginPath();
+      ctx.moveTo(wx + ww / 2, wy);
+      ctx.lineTo(wx + ww / 2, wy + wh);
+      ctx.moveTo(wx, wy + wh / 2);
+      ctx.lineTo(wx + ww, wy + wh / 2);
+      ctx.stroke();
+    }
+
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
